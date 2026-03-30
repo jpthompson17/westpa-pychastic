@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "westpa-pychastic"
+version = "0.1.0"
+readme = "README.md"
+dependencies = [
+    "westpa",
+    "pychastic",
+]
+requires-python = ">= 3.10"
