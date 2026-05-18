@@ -8,14 +8,14 @@ import westpa
 
 class SDEPropagator(westpa.Propagator):
 
-    def __init__(self, *, problem, solver, seed=None):
+    def __init__(self, *, problem, solver, **kwargs):
+        super().__init__(**kwargs)
         self.problem = problem
         self.solver = solver
-        super().__init__(seed=seed)
 
     def propagate_block(self, segments):
-        rng =  np.random.default_rng([segments[0].seg_id, segments[0].n_iter, self.seed])
-        # see https://numpy.org/doc/2.2/reference/random/parallel.html#sequence-of-integer-seeds
+        child_seed = self.get_child_seed(segments[0])
+        rng =  np.random.default_rng(seed=child_seed)
 
         self.problem.x0 = np.array([segment.initial_state.coord for segment in segments])
         result = self.solver.solve_many(
@@ -41,7 +41,8 @@ class BrownianPropagator(SDEPropagator):
         friction_coefficient,
         step_size,
         steps,
-        seed=None,
+        root_seed=None,
+        block_size=None,
     ):
         super().__init__(
             problem=SDEProblem(
@@ -51,5 +52,6 @@ class BrownianPropagator(SDEPropagator):
                 tmax=steps * step_size,
             ),
             solver=SDESolver(dt=step_size),
-            seed=seed,
+            root_seed=root_seed,
+            block_size=block_size,
         )
