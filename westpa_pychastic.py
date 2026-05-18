@@ -8,7 +8,7 @@ import westpa
 
 class SDEPropagator(westpa.Propagator):
 
-    def __init__(self, *, problem, solver, **kwargs):
+    def __init__(self, problem, solver, **kwargs):
         super().__init__(**kwargs)
         self.problem = problem
         self.solver = solver
@@ -35,14 +35,12 @@ class BrownianPropagator(SDEPropagator):
 
     def __init__(
         self,
-        *,
         potential,
         inverse_temperature,
         friction_coefficient,
         step_size,
         steps,
-        root_seed=None,
-        block_size=None,
+        **kwargs,
     ):
         super().__init__(
             problem=SDEProblem(
@@ -52,6 +50,5 @@ class BrownianPropagator(SDEPropagator):
                 tmax=steps * step_size,
             ),
             solver=SDESolver(dt=step_size),
-            root_seed=root_seed,
-            block_size=block_size,
+            **kwargs,
         )
