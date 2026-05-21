@@ -13,10 +13,7 @@ class SDEPropagator(westpa.Propagator):
         self.problem = problem
         self.solver = solver
 
-    def propagate_block(self, segments):
-        child_seed = self.get_child_seed(segments[0])
-        rng =  np.random.default_rng(seed=child_seed)
-
+    def propagate_block(self, segments, rng):
         self.problem.x0 = np.array([segment.initial_state.coord for segment in segments])
         result = self.solver.solve_many(
             self.problem,
@@ -24,9 +21,8 @@ class SDEPropagator(westpa.Propagator):
             progress_bar=False,
             seed=rng.integers(0, np.iinfo(int).max),
         )
-
-        for i, segment in enumerate(segments):
-            segment.final_state = westpa.State(coord=result['solution_values'][i, -1])
+        for segment, coord in zip(segments, result['solution_values'][:, -1]):
+            segment.final_state = westpa.State(coord=coord)
 
         return segments
 
