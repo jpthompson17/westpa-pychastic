@@ -6,14 +6,14 @@ from pychastic.sde_solver import SDESolver
 import westpa
 
 
-class SDEPropagator(westpa.Propagator):
+class SDEPropagator(westpa.VectorizedPropagator):
 
     def __init__(self, problem, solver, **kwargs):
         super().__init__(**kwargs)
         self.problem = problem
         self.solver = solver
 
-    def propagate_block(self, segments, rng):
+    def propagate(self, segments, rng):
         self.problem.x0 = np.array([segment.initial_state.coord for segment in segments])
         result = self.solver.solve_many(
             self.problem,
